@@ -45,10 +45,7 @@ fn inner_main() -> Result<(), Error> {
     let g = (rgb.green*100.0) as i64;
     let b = (rgb.blue*100.0) as i64;
 
-    println!("{:?}", generated_colour);
-    println!("{:?}", new_colour);
     println!("\x1b[48;2;{};{};{}m  ", r, g, b);
-    println!("{}, {}, {}", red/100.0, green/100.0, blue/100.0);
     println!("{}, {}, {}", r, g, b);
 
     // We've made it to the end successfully! Well done, code.
