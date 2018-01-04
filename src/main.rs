@@ -33,21 +33,23 @@ fn inner_main() -> Result<(), Error> {
     // Programming isn't about WHY, it's about WHY NOT!
     // WHY is so much of our code panicking upon an error? Why not MARRY Result<T, E> if you love it so much?
     // In fact, why not invent a special safety door that won't kick your butt on the way out, because YOU ARE FIRED.
-    let red = rand(0, 255);
-    let green = rand(0, 255);
-    let blue = rand(0, 255);
+    let red = rand(0, 100);
+    let green = rand(0, 100);
+    let blue = rand(0, 100);
     // HSL
-    let generated_colour = Hsl::from_rgb(Rgb::from(Srgb::new(red, green, blue)).into());
-    let new_colour = Hsl::from_hsl(generated_colour.shift_hue(rand(-80, 80).into()).saturate(rand(0, 255)).lighten(rand(0, 255)));
+    let generated_colour = Hsl::from_rgb(Rgb::from(Srgb::new(red/100.0, green/100.0, blue/100.0)).into()); // Whatever is going in right now is OK.
+    let new_colour = Hsl::from_hsl(generated_colour.shift_hue(rand(-80, 80).into()).saturate(rand(0, 100)/100.0).lighten(rand(0, 100)/100.0));
+    let rgb = Rgb::from_hsl(new_colour);
 
-    let h = new_colour.hue;
-    let s = new_colour.saturation as i64;
-    let l = 0;
+    let r = (rgb.red*100.0) as i64;
+    let g = (rgb.green*100.0) as i64;
+    let b = (rgb.blue*100.0) as i64;
 
     println!("{:?}", generated_colour);
-    println!("{:?}", new_colour.saturation);
-    println!("\x1b[48;2;{:?};{};{}m  ", h, s, l);
-    println!("{}, {}, {}", red, green, blue);
+    println!("{:?}", new_colour);
+    println!("\x1b[48;2;{};{};{}m  ", r, g, b);
+    println!("{}, {}, {}", red/100.0, green/100.0, blue/100.0);
+    println!("{}, {}, {}", r, g, b);
 
     // We've made it to the end successfully! Well done, code.
     Ok(())
