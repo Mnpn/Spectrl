@@ -1,0 +1,6 @@
+[package]
+name = "spectrl"
+version = "0.1.0"
+authors = ["Martin Persson <mnpn03@gmail.com>"]
+
+[dependencies]
