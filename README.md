@@ -11,7 +11,7 @@ Spectrl lets you choose an amount of randomised colours that fit well together. 
 ### Installation
 If you don't want to compile the thing yourself, download the latest release [here](https://github.com/Mnpn03/Spectrl/releases).
 
-If you instead want to compile avgfile, you can do so by getting [Rust](https://www.rust-lang.org/).
+If you instead want to compile Spectrl, you can do so by getting [Rust](https://www.rust-lang.org/).
 Once that is installed, clone the repository:
 `git clone git@github.com:Mnpn03/Spectrl.git` to clone with SSH, or
 `git clone https://github.com/Mnpn03/Spectrl.git` to clone with HTTPS.
