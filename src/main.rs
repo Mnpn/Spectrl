@@ -36,9 +36,9 @@ fn inner_main() -> Result<(), Error> {
 
     // HSL
     let generated_colour = Hsl::from_rgb(Rgb::from(Srgb::new(rand(0.0, 1.0), rand(0.0, 1.0), rand(0.0, 1.0))).into());
-    let new_color = Hsl::from_hsl(generated_colour.shift_hue(rand(-80.0, 80.0).into()).saturate(rand(0.0, 255.0)).lighten(rand(0.0, 1.0)).into());
+    let new_colour = Hsl::from_hsl(generated_colour.shift_hue(rand(-80.0, 80.0).into()).saturate(rand(0.0, 255.0)).lighten(rand(0.0, 1.0)).into());
 
-    println!("You're more useless than my old printer. {}", aoc);
+    println!("You're more useless than my old printer. {:?}", new_colour);
 
     // We've made it to the end successfully! Well done, code.
     Ok(())
