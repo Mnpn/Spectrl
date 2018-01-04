@@ -5,9 +5,10 @@ extern crate palette;
 use clap::{App, Arg};
 use std::io::Error;
 use rand::Rng;
-use palette::{Rgb, Hsl, Hue};
+use palette::{Rgb, Hsl, Hue, Saturate};
 use palette::pixel::Srgb;
 use palette::FromColor;
+use palette::Shade;
 
 fn main() {
     // If any error would occur in inner_main(), print the error.
@@ -33,9 +34,9 @@ fn inner_main() -> Result<(), Error> {
     // WHY is so much of our code panicking upon an error? Why not MARRY Result<T, E> if you love it so much?
     // In fact, why not invent a special safety door that won't kick your butt on the way out, because YOU ARE FIRED.
 
-    //HSL
+    // HSL
     let generated_colour = Hsl::from_rgb(Rgb::from(Srgb::new(rand(0.0, 1.0), rand(0.0, 1.0), rand(0.0, 1.0))).into());
-    let new_color = Hsl::from_hsl(generated_colour.shift_hue(rand(-80.0, 80.0).into()));
+    let new_color = Hsl::from_hsl(generated_colour.shift_hue(rand(-80.0, 80.0).into()).saturate(rand(0.0, 255.0)).lighten(rand(0.0, 1.0)).into());
 
     println!("You're more useless than my old printer. {}", aoc);
 
