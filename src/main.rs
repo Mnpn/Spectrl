@@ -5,7 +5,7 @@ extern crate palette;
 use clap::{App, Arg};
 use std::io::Error;
 use rand::Rng;
-use palette::{Rgb, Lch, Hue};
+use palette::{Rgb, Hsl, Hue};
 use palette::pixel::Srgb;
 use palette::FromColor;
 
@@ -34,8 +34,8 @@ fn inner_main() -> Result<(), Error> {
     // In fact, why not invent a special safety door that won't kick your butt on the way out, because YOU ARE FIRED.
 
     //HSL
-    let generated_colour = Lch::from_rgb(Rgb::from(Srgb::new(rand(0.0, 1.0), rand(0.0, 1.0), rand(0.0, 1.0))).into());
-    let new_color = Lch::from_lch(generated_colour.shift_hue(rand(-80.0, 80.0).into()));
+    let generated_colour = Hsl::from_rgb(Rgb::from(Srgb::new(rand(0.0, 1.0), rand(0.0, 1.0), rand(0.0, 1.0))).into());
+    let new_color = Hsl::from_hsl(generated_colour.shift_hue(rand(-80.0, 80.0).into()));
 
     println!("You're more useless than my old printer. {}", aoc);
 
