@@ -24,8 +24,7 @@ fn inner_main() -> Result<(), Error> {
         .author(crate_authors!())
         .arg(Arg::with_name("aoc")
             .help("Amount of colours to display.")
-            .required(true) // Make argument required.
-            .index(1))
+            .required(true)) // Make argument required.
         .get_matches();
 
     // Define variables.
