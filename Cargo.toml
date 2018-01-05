@@ -1,12 +1,16 @@
 [package]
+authors = ["Martin Persson <mnpn03@gmail.com>"]
+build = "build.rs"
 name = "spectrl"
 version = "1.0.0"
-authors = ["Martin Persson <mnpn03@gmail.com>"]
-
 [dependencies]
 clap = "2.29.0"
-rand = "0.4.1"
+gdk = "0.7.0"
 palette = "0.2.1"
+rand = "0.4.1"
 
-[target."cfg(windows)".dependencies]
-gtk = "0.3.0"
+[target."cfg(not(windows))".dependencies.gtk]
+optional = true
+version = "0.3.0"
+[target."cfg(windows)".dependencies.gtk]
+version = "0.3.0"

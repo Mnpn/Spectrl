@@ -1,15 +1,16 @@
 // Only use GTK on Windows.
-#[cfg(windows)]
-extern crate gtk;
-#[cfg(windows)]
-use gtk::prelude::*;
+#[cfg(gtk)] extern crate gdk;
+#[cfg(gtk)] extern crate gtk;
+#[cfg(gtk)] use gdk::RGBA;
+#[cfg(gtk)] use gtk::prelude::*;
+#[cfg(gtk)] use gtk::{Box as GtkBox, Label, Orientation, StateFlags, Window, WindowType};
 
 #[macro_use]
 extern crate clap;
 extern crate rand;
 extern crate palette;
 use clap::{App, Arg};
-use std::io::Error;
+use std::error::Error;
 use rand::Rng;
 use palette::{Rgb, Hsv, Hue, Saturate};
 use palette::pixel::Srgb;
@@ -21,17 +22,9 @@ fn main() {
     if let Err(err) = inner_main() {
         eprintln!("{}", err);
     }
-
-    // We're using GTK to display colours, but only on Windows.
-    #[cfg(windows)] {
-        if gtk::init().is_err() {
-            println!("Failed to initialize GTK.");
-            return;
-        }
-    }
 }
 
-fn inner_main() -> Result<(), Error> {
+fn inner_main() -> Result<(), Box<Error>> {
     // clap app creation, with macros that read project information from Cargo.toml.
     let matches = App::new(crate_name!())
         .version(crate_version!())
@@ -42,17 +35,18 @@ fn inner_main() -> Result<(), Error> {
             .required(true)) // Make argument required.
         .get_matches();
 
-    // Define variables.
-    // Create a GTK window, but only on Windows.
-    #[cfg(windows)]
+    // Create a GTK window.
+    #[cfg(gtk)]
+    gtk::init()?;
+    #[cfg(gtk)]
     let window = Window::new(WindowType::Toplevel);
-    #[cfg(windows)] {
+    #[cfg(gtk)] {
         window.set_title("Spectrl");
         window.set_default_size(800, 600);
     }
-    #[cfg(windows)]
+    #[cfg(gtk)]
     let container = GtkBox::new(Orientation::Vertical, 0);
-    #[cfg(windows)]
+    #[cfg(gtk)]
     window.add(&container);
 
     let mut aoc = value_t!(matches, "aoc", i32).unwrap_or_else(|e| e.exit());
@@ -83,33 +77,64 @@ fn inner_main() -> Result<(), Error> {
         let rgb = Rgb::from_hsv(new_colour); // Turn HSV into RGB.
 
         // Make f64s into i64s.
-        let r = (rgb.red * 100.0) as i64;
-        let g = (rgb.green * 100.0) as i64;
-        let b = (rgb.blue * 100.0) as i64;
+        let r = rgb.red * 100.0;
+        let g = rgb.green * 100.0;
+        let b = rgb.blue * 100.0;
 
         // If any value would drop below zero (which we can't display), continue.
-        if r < 0 || g < 0 || b < 0 {
+        if r < 0.0 || g < 0.0 || b < 0.0 {
             continue;
         }
 
-        #[cfg(not(windows))] { // Print on all systems, except for Windows.
+        let (r, g, b) = (r as u8, g as u8, b as u8);
+
+        #[cfg(not(gtk))] { // Print on all systems, except for Windows.
             println!(
-                "\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
+                "\x1b[38;2;{ri};{gi};{bi}m\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
                 r = r,
                 g = g,
-                b = b
+                b = b,
+                ri = 255 - r,
+                gi = 255 - g,
+                bi = 255 - b
             );
         }
-        #[cfg(windows)] { // Make GTK Labels on Windows.
-            let label = Label::new("hello");
+        #[cfg(gtk)] { // Make GTK Labels on Windows.
+            use std::fmt::Write;
+
+            let mut string = String::with_capacity(1 + 2*3);
+            write!(string, "#{:02X}{:02X}{:02X}", r, g, b).unwrap();
+
+            let label = Label::new(&*string);
+            label.override_color(StateFlags::NORMAL, &RGBA {
+                red: 1.0 - rgb.red,
+                green: 1.0 - rgb.green,
+                blue: 1.0 - rgb.blue,
+                alpha: 1.0
+            });
+            label.connect_draw(move |label, ctx| {
+                let rect = label.get_allocation();
+                println!("{:?}", rect);
+                println!("{:?}", rgb);
+
+                ctx.rectangle(0.0, 0.0, rect.width as f64, rect.height as f64);
+                ctx.set_source_rgb(rgb.red, rgb.green, rgb.blue);
+                ctx.fill();
+
+                Inhibit(false)
+            });
             container.add(&label);
         }
         aoc -= 1;
     }
-    #[cfg(windows)]
-    window.show_all();
-    #[cfg(windows)]
-    gtk::main();
+    #[cfg(gtk)] {
+        window.show_all();
+        window.connect_delete_event(move |_, _| {
+            gtk::main_quit();
+            Inhibit(false)
+        });
+        gtk::main();
+    }
 
     // We've made it to the end successfully! Well done, code.
     Ok(())
