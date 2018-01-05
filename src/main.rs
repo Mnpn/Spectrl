@@ -1,3 +1,9 @@
+// Only use GTK on Windows.
+#[cfg(windows)]
+extern crate gtk;
+#[cfg(windows)]
+use gtk::prelude::*;
+
 #[macro_use]
 extern crate clap;
 extern crate rand;
@@ -15,6 +21,14 @@ fn main() {
     if let Err(err) = inner_main() {
         eprintln!("{}", err);
     }
+
+    // We're using GTK to display colours, but only on Windows.
+    #[cfg(windows)] {
+        if gtk::init().is_err() {
+            println!("Failed to initialize GTK.");
+            return;
+        }
+    }
 }
 
 fn inner_main() -> Result<(), Error> {
@@ -29,6 +43,18 @@ fn inner_main() -> Result<(), Error> {
         .get_matches();
 
     // Define variables.
+    // Create a GTK window, but only on Windows.
+    #[cfg(windows)]
+    let window = Window::new(WindowType::Toplevel);
+    #[cfg(windows)] {
+        window.set_title("Spectrl");
+        window.set_default_size(800, 600);
+    }
+    #[cfg(windows)]
+    let container = GtkBox::new(Orientation::Vertical, 0);
+    #[cfg(windows)]
+    window.add(&container);
+
     let mut aoc = value_t!(matches, "aoc", i32).unwrap_or_else(|e| e.exit());
     // AOC is a string and we want it to be an i32.
     // If it fails (Number isn't a number), exit and error.
@@ -66,14 +92,24 @@ fn inner_main() -> Result<(), Error> {
             continue;
         }
 
-        println!(
-            "\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
-            r = r,
-            g = g,
-            b = b
-        );
+        #[cfg(not(windows))] { // Print on all systems, except for Windows.
+            println!(
+                "\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
+                r = r,
+                g = g,
+                b = b
+            );
+        }
+        #[cfg(windows)] { // Make GTK Labels on Windows.
+            let label = Label::new("hello");
+            container.add(&label);
+        }
         aoc -= 1;
     }
+    #[cfg(windows)]
+    window.show_all();
+    #[cfg(windows)]
+    gtk::main();
 
     // We've made it to the end successfully! Well done, code.
     Ok(())
