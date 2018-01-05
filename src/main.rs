@@ -29,7 +29,9 @@ fn inner_main() -> Result<(), Error> {
         .get_matches();
 
     // Define variables.
-    let mut aoc = matches.value_of("aoc").unwrap().parse::<i32>().unwrap(); // AOC is a string and we want it to be an i32.
+    let mut aoc = value_t!(matches, "aoc", i32).unwrap_or_else(|e| e.exit());
+    // AOC is a string and we want it to be an i32.
+    // If it fails (Number isn't a number), exit and error.
     // Programming isn't about WHY, it's about WHY NOT!
     // WHY is so much of our code panicking upon an error? Why not MARRY Result<T, E> if you love it so much?
     // In fact, why not invent a special safety door that won't kick your butt on the way out, because YOU ARE FIRED.
