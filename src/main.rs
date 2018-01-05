@@ -121,8 +121,6 @@ fn inner_main() -> Result<(), Box<Error>> {
                 ctx.set_source_rgb(rgb.red, rgb.green, rgb.blue);
                 ctx.fill();
 
-                ctx.set_source_rgb(1.0 - rgb.red, 1.0 - rgb.green, 1.0 - rgb.blue);
-                ctx.show_text("YEE");
                 Inhibit(false)
             });
             container.add(&label);
