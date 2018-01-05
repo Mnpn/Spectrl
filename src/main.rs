@@ -32,33 +32,46 @@ fn inner_main() -> Result<(), Error> {
     let mut aoc = value_t!(matches, "aoc", i32).unwrap_or_else(|e| e.exit());
     // AOC is a string and we want it to be an i32.
     // If it fails (Number isn't a number), exit and error.
+
     // Programming isn't about WHY, it's about WHY NOT!
-    // WHY is so much of our code panicking upon an error? Why not MARRY Result<T, E> if you love it so much?
-    // In fact, why not invent a special safety door that won't kick your butt on the way out, because YOU ARE FIRED.
+    // WHY is so much of our code panicking upon an error?
+    // Why not MARRY Result<T, E> if you love it so much?
+    // In fact, why not invent a special safety door that
+    // won't kick your butt on the way out, because YOU ARE FIRED.
 
     // Randomise three initial colours.
     let red = rand(0, 100);
     let green = rand(0, 100);
     let blue = rand(0, 100);
-    
+
     // Create an HSV colour from RGB inputs.
-    let generated_colour = Hsv::from_rgb(Rgb::from(Srgb::new(red/100.0, green/100.0, blue/100.0)).into());
+    let generated_colour = Hsv::from_rgb(
+        Rgb::from(Srgb::new(red / 100.0, green / 100.0, blue / 100.0)).into(),
+    );
     while aoc > 0 {
         // Randomly change HSV values of generated_colour.
-        let new_colour = generated_colour.shift_hue(rand(-80, 80).into()).saturate(rand(0, 100)/100.0).lighten(rand(0, 100)/100.0);
+        let new_colour = generated_colour
+            .shift_hue(rand(-80, 80).into())
+            .saturate(rand(0, 100) / 100.0)
+            .lighten(rand(0, 100) / 100.0);
         let rgb = Rgb::from_hsv(new_colour); // Turn HSV into RGB.
 
         // Make f64s into i64s.
-        let r = (rgb.red*100.0) as i64;
-        let g = (rgb.green*100.0) as i64;
-        let b = (rgb.blue*100.0) as i64;
+        let r = (rgb.red * 100.0) as i64;
+        let g = (rgb.green * 100.0) as i64;
+        let b = (rgb.blue * 100.0) as i64;
 
         // If any value would drop below zero (which we can't display), continue.
         if r < 0 || g < 0 || b < 0 {
             continue;
         }
 
-        println!("\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m", r=r, g=g, b=b);
+        println!(
+            "\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
+            r = r,
+            g = g,
+            b = b
+        );
         aoc -= 1;
     }
 
@@ -69,5 +82,6 @@ fn inner_main() -> Result<(), Error> {
 // Rand function takes i64 values and returns f64s.
 fn rand(one: i64, two: i64) -> f64 {
     rand::thread_rng().gen_range(one, two) as f64
-    // This mostly helps me, so that I can just use `rand(0, 1)` instead of `rand::thread_rng().gen_range(0, 1)` every time.
+    // This mostly helps me, so that I can just use `rand(0, 1)`
+    // instead of `rand::thread_rng().gen_range(0, 1)` every time.
 }
