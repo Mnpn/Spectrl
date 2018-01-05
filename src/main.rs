@@ -5,7 +5,7 @@ extern crate palette;
 use clap::{App, Arg};
 use std::io::Error;
 use rand::Rng;
-use palette::{Rgb, Hsl, Hue, Saturate};
+use palette::{Rgb, Hsv, Hue, Saturate};
 use palette::pixel::Srgb;
 use palette::FromColor;
 use palette::Shade;
@@ -29,7 +29,7 @@ fn inner_main() -> Result<(), Error> {
         .get_matches();
 
     // Define variables.
-    let aoc = matches.value_of("aoc").unwrap().parse::<i32>().unwrap();
+    let mut aoc = matches.value_of("aoc").unwrap().parse::<i32>().unwrap();
     // Programming isn't about WHY, it's about WHY NOT!
     // WHY is so much of our code panicking upon an error? Why not MARRY Result<T, E> if you love it so much?
     // In fact, why not invent a special safety door that won't kick your butt on the way out, because YOU ARE FIRED.
@@ -37,16 +37,21 @@ fn inner_main() -> Result<(), Error> {
     let green = rand(0, 100);
     let blue = rand(0, 100);
     
-    let generated_colour = Hsl::from_rgb(Rgb::from(Srgb::new(red/100.0, green/100.0, blue/100.0)).into());
-    for i in 0..aoc {
-        let new_colour = Hsl::from_hsl(generated_colour.shift_hue(rand(-80, 80).into()).saturate(rand(0, 100)/100.0).lighten(rand(0, 100)/100.0));
-        let rgb = Rgb::from_hsl(new_colour);
+    let generated_colour = Hsv::from_rgb(Rgb::from(Srgb::new(red/100.0, green/100.0, blue/100.0)).into());
+    while aoc > 0 {
+        let new_colour = generated_colour.shift_hue(rand(-80, 80).into()).saturate(rand(0, 100)/100.0).lighten(rand(0, 100)/100.0);
+        let rgb = Rgb::from_hsv(new_colour);
 
         let r = (rgb.red*100.0) as i64;
         let g = (rgb.green*100.0) as i64;
         let b = (rgb.blue*100.0) as i64;
 
-        println!("\x1b[48;2;{};{};{}m  ", r, g, b);
+        if r < 0 || g < 0 || b < 0 {
+            continue;
+        }
+
+        println!("\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m", r=r, g=g, b=b);
+        aoc -= 1;
     }
     //println!("{}, {}, {}", r, g, b);
 
