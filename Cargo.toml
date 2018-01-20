@@ -12,5 +12,7 @@ rand = "0.4.1"
 [target."cfg(not(windows))".dependencies.gtk]
 optional = true
 version = "0.3.0"
+features = [ "v3_16" ]
 [target."cfg(windows)".dependencies.gtk]
 version = "0.3.0"
+features = [ "v3_16" ]

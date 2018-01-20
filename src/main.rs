@@ -1,4 +1,5 @@
 // Only use GTK on Windows.
+#![windows_subsystem = "windows"]
 #[cfg(gtk)] extern crate gdk;
 #[cfg(gtk)] extern crate gtk;
 #[cfg(gtk)] use gdk::RGBA;
