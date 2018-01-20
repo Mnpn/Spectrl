@@ -18,9 +18,14 @@ Once that is installed, clone the repository:
 Then you simply build it by running `cargo build --release`.
 
 ### Usage
+Linux (and Windows):
 ```
 $ spectrl <amount of colours>
 ```
+Windows (Release):
+
+See `1_README.txt` in the download.
+
 ### Contribution
 To contribute to the project, simply create a [Pull Request](https://github.com/Mnpn03/Spectrl/pulls) or an [Issue](https://github.com/Mnpn03/Spectrl/issues).
 
