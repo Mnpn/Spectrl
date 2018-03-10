@@ -2,6 +2,9 @@
 
 Spectrl lets you choose an amount of randomised colours that fit well together. Spectrl is made in [Rust](https://www.rust-lang.org/).
 
+![](https://i.imgur.com/s4XUfow.png)
+*Five Spectrl GTK windows running on Windows.*
+
 ### ToC - Table of Content
 - [Installation](#installation)
 - [Usage](#usage)
