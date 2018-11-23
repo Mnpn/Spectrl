@@ -72,7 +72,7 @@ fn inner_main() -> Result<(), Box<Error>> {
     while aoc > 0 {
         // Randomly change HSV values of generated_colour.
         let new_colour = generated_colour
-            .shift_hue(rand(-80, 80).into())
+            .shift_hue(rand(-40, 40).into())
             .saturate(rand(0, 100) / 100.0)
             .lighten(rand(0, 100) / 100.0);
         let rgb = Rgb::from_hsv(new_colour); // Turn HSV into RGB.
