@@ -18,14 +18,7 @@ use palette::pixel::Srgb;
 use palette::FromColor;
 use palette::Shade;
 
-fn main() {
-    // If any error would occur in inner_main(), print the error.
-    if let Err(err) = inner_main() {
-        eprintln!("{}", err);
-    }
-}
-
-fn inner_main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<Error>> {
     // clap app creation, with macros that read project information from Cargo.toml.
     let matches = App::new(crate_name!())
         .version(crate_version!())
