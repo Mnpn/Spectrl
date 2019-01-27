@@ -42,8 +42,8 @@ fn inner_main() -> Result<(), Box<Error>> {
     #[cfg(gtk)]
     let window = Window::new(WindowType::Toplevel);
     #[cfg(gtk)] {
-        window.set_title("Spectrl");
-        window.set_default_size(800, 600);
+        window.set_title(&format!("Spectrl {}", crate_version!()));
+        window.set_default_size(300, 10);
     }
     #[cfg(gtk)]
     let container = GtkBox::new(Orientation::Vertical, 0);
@@ -89,7 +89,7 @@ fn inner_main() -> Result<(), Box<Error>> {
 
         let (r, g, b) = (r as u8, g as u8, b as u8);
 
-        #[cfg(not(gtk))] { // Print on all systems, except for Windows.
+        #[cfg(not(gtk))] { // Print unless GTK
             println!(
                 "\x1b[38;2;{ri};{gi};{bi}m\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
                 r = r,
@@ -100,7 +100,7 @@ fn inner_main() -> Result<(), Box<Error>> {
                 bi = 255 - b
             );
         }
-        #[cfg(gtk)] { // Make GTK Labels on Windows.
+        #[cfg(gtk)] { // Make GTK labels if compiled with GTK
             use std::fmt::Write;
 
             let mut string = String::with_capacity(1 + 2*3);
