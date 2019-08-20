@@ -1,4 +1,4 @@
-# Spectrl [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=flat-square)](https://paypal.me/mnpn03/)
+# Spectrl
 
 Spectrl lets you choose an amount of randomised colours that fit well together. Spectrl is made in [Rust](https://www.rust-lang.org/).
 
