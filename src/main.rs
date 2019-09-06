@@ -65,8 +65,11 @@ fn main() -> Result<(), Box<Error>> {
 
     #[cfg(gtk)] // Colour picker button
     let button = ColorButton::new_with_rgba(&RGBA{ red: red / 100.0, green: green / 100.0, blue: blue / 100.0, alpha: 1.0 });
-    button.connect_clicked(move |_| {
-        println!("wat");
+    button.set_tooltip_markup("Get matches for a <b>custom colour</b>!");
+    button.set_title("Spectrl: Custom colour");
+    button.connect_color_set(move |colour| { // when a new colour is set
+        let rgba = colour.get_rgba();
+        println!("{:?}", Hsv::from_rgb(Rgb::from(Srgb::new(rgba.red, rgba.green, rgba.blue))));
     });
     container.add(&button);
 
