@@ -4,7 +4,7 @@
 #[cfg(gtk)] extern crate gtk;
 #[cfg(gtk)] use gdk::RGBA;
 #[cfg(gtk)] use gtk::prelude::*;
-#[cfg(gtk)] use gtk::{Box as GtkBox, Label, Orientation, StateFlags, Window, WindowType};
+#[cfg(gtk)] use gtk::{Box as GtkBox, ColorButton, Label, Orientation, StateFlags, Window, WindowType};
 
 #[macro_use]
 extern crate clap;
@@ -62,6 +62,14 @@ fn main() -> Result<(), Box<Error>> {
     let generated_colour = Hsv::from_rgb(
         Rgb::from(Srgb::new(red / 100.0, green / 100.0, blue / 100.0)).into(),
     );
+
+    #[cfg(gtk)] // Colour picker button
+    let button = ColorButton::new_with_rgba(&RGBA{ red: red / 100.0, green: green / 100.0, blue: blue / 100.0, alpha: 1.0 });
+    button.connect_clicked(move |_| {
+        println!("wat");
+    });
+    container.add(&button);
+
     while aoc > 0 {
         // Randomly change HSV values of generated_colour.
         let new_colour = generated_colour
@@ -93,7 +101,8 @@ fn main() -> Result<(), Box<Error>> {
                 bi = 255 - b
             );
         }
-        #[cfg(gtk)] { // Make GTK labels if compiled with GTK
+        #[cfg(gtk)] { // Make GTK window if compiled with GTK
+            // GTK Labels
             use std::fmt::Write;
 
             let mut string = String::with_capacity(1 + 2*3);
@@ -108,8 +117,6 @@ fn main() -> Result<(), Box<Error>> {
             });
             label.connect_draw(move |label, ctx| {
                 let rect = label.get_allocation();
-                println!("{:?}", rect);
-                println!("{:?}", rgb);
 
                 ctx.rectangle(0.0, 0.0, rect.width as f64, rect.height as f64);
                 ctx.set_source_rgb(rgb.red, rgb.green, rgb.blue);
