@@ -1,16 +1,15 @@
-// Only use GTK on Windows.
-#![windows_subsystem = "windows"]
-#[cfg(gtk)] extern crate gdk;
-#[cfg(gtk)] extern crate gtk;
-#[cfg(gtk)] use gdk::RGBA;
-#[cfg(gtk)] use gtk::prelude::*;
-#[cfg(gtk)] use gtk::{Box as GtkBox, ColorButton, Label, Orientation, StateFlags, Window, WindowType};
+extern crate gdk;
+extern crate gtk;
+use gdk::RGBA;
+use gtk::prelude::*;
+use gtk::{Box as GtkBox, ColorButton, Label, Orientation, StateFlags, Window, WindowType};
 
 #[macro_use]
 extern crate clap;
 extern crate rand;
 extern crate palette;
 use clap::{App, Arg};
+use std::fmt::Write;
 use std::error::Error;
 use rand::Rng;
 use palette::{Rgb, Hsv, Hue, Saturate};
@@ -30,20 +29,14 @@ fn main() -> Result<(), Box<Error>> {
         .get_matches();
 
     // Create a GTK window.
-    #[cfg(gtk)]
     gtk::init()?;
-    #[cfg(gtk)]
     let window = Window::new(WindowType::Toplevel);
-    #[cfg(gtk)] {
-        window.set_title(&format!("Spectrl {}", crate_version!()));
-        window.set_default_size(300, 10);
-    }
-    #[cfg(gtk)]
+    window.set_title(&format!("Spectrl {}", crate_version!()));
+    window.set_default_size(300, 10);
     let container = GtkBox::new(Orientation::Vertical, 0);
-    #[cfg(gtk)]
     window.add(&container);
 
-    let mut aoc = value_t!(matches, "aoc", i32).unwrap_or_else(|e| e.exit());
+    let aoc = value_t!(matches, "aoc", i32).unwrap_or_else(|e| e.exit());
     // AOC is a string and we want it to be an i32.
     // If it fails (Number isn't a number), exit and error.
 
@@ -63,23 +56,40 @@ fn main() -> Result<(), Box<Error>> {
         Rgb::from(Srgb::new(red / 100.0, green / 100.0, blue / 100.0)).into(),
     );
 
-    #[cfg(gtk)] // Colour picker button
+    // Colour picker button
+    let container2 = container.clone();
     let button = ColorButton::new_with_rgba(&RGBA{ red: red / 100.0, green: green / 100.0, blue: blue / 100.0, alpha: 1.0 });
     button.set_tooltip_markup("Get matches for a <b>custom colour</b>!");
     button.set_title("Spectrl: Custom colour");
     button.connect_color_set(move |colour| { // when a new colour is set
         let rgba = colour.get_rgba();
-        println!("{:?}", Hsv::from_rgb(Rgb::from(Srgb::new(rgba.red, rgba.green, rgba.blue))));
+        let button_colour = Hsv::from_rgb(Rgb::from(Srgb::new(rgba.red, rgba.green, rgba.blue)));
+        println!("{:?}", button_colour);
+        spectrl(aoc, button_colour, &container2);
     });
     container.add(&button);
 
+    spectrl(aoc, generated_colour, &container);
+
+    window.show_all();
+    window.connect_delete_event(move |_, _| {
+        gtk::main_quit();
+        Inhibit(false)
+    });
+    gtk::main();
+
+    // We've made it to the end successfully! Well done, code.
+    Ok(())
+}
+
+fn spectrl(mut aoc: i32, generated_colour: Hsv<f64>, container: &GtkBox) {
     while aoc > 0 {
         // Randomly change HSV values of generated_colour.
         let new_colour = generated_colour
             .shift_hue(rand(-40, 40).into())
             .saturate(rand(0, 100) / 100.0)
             .lighten(rand(0, 100) / 100.0);
-        let rgb = Rgb::from_hsv(new_colour); // Turn HSV into RGB.
+        let rgb = Rgb::from_hsv(new_colour);
 
         // Make f64s into i64s.
         let r = rgb.red * 100.0;
@@ -93,55 +103,28 @@ fn main() -> Result<(), Box<Error>> {
 
         let (r, g, b) = (r as u8, g as u8, b as u8);
 
-        #[cfg(not(gtk))] { // Print unless GTK
-            println!(
-                "\x1b[38;2;{ri};{gi};{bi}m\x1b[48;2;{r};{g};{b}m   #{r:02X}{g:02X}{b:02X}   \x1b[0;0m",
-                r = r,
-                g = g,
-                b = b,
-                ri = 255 - r,
-                gi = 255 - g,
-                bi = 255 - b
-            );
-        }
-        #[cfg(gtk)] { // Make GTK window if compiled with GTK
-            // GTK Labels
-            use std::fmt::Write;
+        let mut string = String::with_capacity(1 + 2*3);
+        write!(string, "#{:02X}{:02X}{:02X}", r, g, b).unwrap();
 
-            let mut string = String::with_capacity(1 + 2*3);
-            write!(string, "#{:02X}{:02X}{:02X}", r, g, b).unwrap();
+        let label = Label::new(&*string);
+        label.override_color(StateFlags::NORMAL, &RGBA {
+            red: 1.0 - rgb.red,
+            green: 1.0 - rgb.green,
+            blue: 1.0 - rgb.blue,
+            alpha: 1.0
+        });
+        label.connect_draw(move |label, ctx| {
+            let rect = label.get_allocation();
 
-            let label = Label::new(&*string);
-            label.override_color(StateFlags::NORMAL, &RGBA {
-                red: 1.0 - rgb.red,
-                green: 1.0 - rgb.green,
-                blue: 1.0 - rgb.blue,
-                alpha: 1.0
-            });
-            label.connect_draw(move |label, ctx| {
-                let rect = label.get_allocation();
+            ctx.rectangle(0.0, 0.0, rect.width as f64, rect.height as f64);
+            ctx.set_source_rgb(rgb.red, rgb.green, rgb.blue);
+            ctx.fill();
 
-                ctx.rectangle(0.0, 0.0, rect.width as f64, rect.height as f64);
-                ctx.set_source_rgb(rgb.red, rgb.green, rgb.blue);
-                ctx.fill();
-
-                Inhibit(false)
-            });
-            container.add(&label);
-        }
-        aoc -= 1;
-    }
-    #[cfg(gtk)] {
-        window.show_all();
-        window.connect_delete_event(move |_, _| {
-            gtk::main_quit();
             Inhibit(false)
         });
-        gtk::main();
+        container.add(&label);
+        aoc -= 1;
     }
-
-    // We've made it to the end successfully! Well done, code.
-    Ok(())
 }
 
 // Rand function takes i64 values and returns f64s.
