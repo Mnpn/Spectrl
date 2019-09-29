@@ -4,7 +4,14 @@ name = "spectrl"
 version = "1.3.0"
 [dependencies]
 clap = "2.29.0"
-gdk = "0.7.0"
+gdk = "0.11.0"
 palette = "0.2.1"
 rand = "0.4.1"
-gtk = "0.3.0"
+
+[dependencies.gtk]
+version = "0.7.0"
+features = ["v3_16"]
+
+[dependencies.gio]
+version = "0.7.0"
+features = ["v2_44"]
