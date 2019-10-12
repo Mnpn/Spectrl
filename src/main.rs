@@ -17,7 +17,7 @@ use palette::pixel::Srgb;
 use palette::FromColor;
 use palette::Shade;
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     // clap app creation, with macros that read project information from Cargo.toml.
     let matches = App::new(crate_name!())
         .version(crate_version!())
