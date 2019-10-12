@@ -59,12 +59,13 @@ fn main() -> Result<(), Box<Error>> {
     // Colour picker button
     let container2 = container.clone();
     let button = ColorButton::new_with_rgba(&RGBA{ red: red / 100.0, green: green / 100.0, blue: blue / 100.0, alpha: 1.0 });
-    button.set_tooltip_markup("Get matches for a <b>custom colour</b>!");
+    button.set_tooltip_markup(Some("Get matches for a <b>custom colour</b>!"));
     button.set_title("Spectrl: Custom colour");
+    window.add(&container2);
     button.connect_color_set(move |colour| { // when a new colour is set
         let rgba = colour.get_rgba();
         let button_colour = Hsv::from_rgb(Rgb::from(Srgb::new(rgba.red, rgba.green, rgba.blue)));
-        println!("{:?}", button_colour);
+        container2.foreach(|w| container2.remove(w));
         spectrl(aoc, button_colour, &container2);
     });
     container.add(&button);
@@ -106,13 +107,13 @@ fn spectrl(mut aoc: i32, generated_colour: Hsv<f64>, container: &GtkBox) {
         let mut string = String::with_capacity(1 + 2*3);
         write!(string, "#{:02X}{:02X}{:02X}", r, g, b).unwrap();
 
-        let label = Label::new(&*string);
-        label.override_color(StateFlags::NORMAL, &RGBA {
+        let label = Label::new(Some(&*string));
+        label.override_color(StateFlags::NORMAL, Some(&RGBA {
             red: 1.0 - rgb.red,
             green: 1.0 - rgb.green,
             blue: 1.0 - rgb.blue,
             alpha: 1.0
-        });
+        }));
         label.connect_draw(move |label, ctx| {
             let rect = label.get_allocation();
 
